@@ -1,8 +1,18 @@
 # xframes-nim
 
+## Instructions
+
+### Install Nim
+
+#### Windows
+
 I recommend to install nim through winget
 
 `winget install nim.nim`
+
+### Compiling and running the application
+
+`nim compile --run main.nim`
 
 ## Screenshots
 
