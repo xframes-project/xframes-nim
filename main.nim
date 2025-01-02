@@ -1,4 +1,4 @@
-import tables, json
+import json, dynlib, strutils, sequtils, rdstdin, os
 
 type
   ImGuiCol = enum
@@ -103,5 +103,112 @@ var fontDefs = %* { "defs": [
   ] 
 }
 
-echo fontDefs
-echo theme2
+# echo fontDefs
+# echo theme2
+
+# type
+#   Node = object
+#     id: string
+#     root: string
+#     typ: string
+
+#   UnformattedText = object
+#     id: string
+#     text: string
+#     typ: string
+
+# # Constructor for Node
+# proc initNode(id, root: string): Node =
+#   result.typ = "node"
+#   result.id = id
+#   result.root = root
+
+# # toJson for Node
+# proc toJson(node: Node): cstring =
+#   %* {
+#     "type": node.typ,
+#     "id": node.id,
+#     "root": node.root
+#   }
+
+# # Constructor for UnformattedText
+# proc initUnformattedText(id, text: string): UnformattedText =
+#   result.typ = "unformatted-text"
+#   result.id = id
+#   result.text = text
+
+# # toJson for UnformattedText
+# proc toJson(utext: UnformattedText): cstring =
+#   %* {
+#     "type": utext.typ,
+#     "id": utext.id,
+#     "text": utext.text
+#   }
+
+# # Example usage
+# let node = initNode("1", "root1")
+# echo toJson(node)
+
+# let uText = initUnformattedText("2", "Some unformatted text")
+# echo toJson(uText)
+
+when defined(windows):
+  const ffiLib = "./xframesshared.dll"
+elif defined(linux):
+  const ffiLib = "./libxframesshared.so"
+elif defined(macosx):
+  const ffiLib = "./libxframesshared.dylib"
+elif defined(bsd):
+  const ffiLib = "./libxframesshared.so"
+else:
+  echo "Unsupported platform"
+  quit(1)
+
+proc init(
+    assetsBasePath: cstring, 
+    rawFontDefinitions: cstring, 
+    rawStyleOverrideDefinitions: cstring,
+    onInit: proc(): void, 
+    onTextChanged: proc(id: cint, value: cstring): void, 
+    onComboChanged: proc(id: cint, selected_index: cint): void,
+    onNumericValueChanged: proc(id: cint, value: cfloat): void, 
+    onBooleanValueChanged: proc(id: cint, value: bool): void,
+    onMultipleNumericValuesChanged: proc(id: cint, values: pointer, num_values: cint): void, 
+    onClick: proc(id: cint): void
+    ) {.importc, dynlib: ffiLib.}
+
+proc onInit(): void =
+    echo "init"
+
+proc onTextChanged(id: cint, value: cstring): void =
+    echo "onTextChanged"
+
+proc onComboChanged(id: cint, selected_index: cint): void =
+    echo "onComboChanged"
+
+proc onNumericValueChanged(id: cint, value: cfloat): void =
+    echo "onNumericValueChanged"
+
+proc onBooleanValueChanged(id: cint, value: bool): void =
+    echo "onBooleanValueChanged"
+
+proc onMultipleNumericValuesChanged(id: cint, values: pointer, num_values: cint): void =
+    echo "onMultipleNumericValuesChanged"
+
+proc onClick(id: cint): void =
+    echo "onClick"
+
+var baseAssetsPath = "./assets"
+
+var a = newString(baseAssetsPath.len)
+
+let fontDefsJson = $fontDefs
+let theme2Json = $theme2
+
+init(baseAssetsPath.cstring(), fontDefsJson.cstring(), theme2Json.cstring(), onInit, onTextChanged, onComboChanged, onNumericValueChanged, onBooleanValueChanged, onMultipleNumericValuesChanged, onClick)
+
+
+# echo readLineFromStdin("Is Nim awesome? (Y/n): ")
+
+while true:
+    sleep 1000
