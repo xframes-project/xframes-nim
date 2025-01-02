@@ -1,4 +1,4 @@
-import json, dynlib, strutils, sequtils, rdstdin, os
+import json, dynlib, strutils, sequtils, rdstdin
 
 type
   ImGuiCol = enum
@@ -103,8 +103,8 @@ var fontDefs = %* { "defs": [
   ] 
 }
 
-# echo fontDefs
-# echo theme2
+echo fontDefs
+echo theme2
 
 # type
 #   Node = object
@@ -164,38 +164,46 @@ else:
   echo "Unsupported platform"
   quit(1)
 
+# type OnInitCb {.importc, dynlib: ffiLib.} = proc(): void
+# type OnTextChangedCb {.importc.} = proc(id: cint, value: cstring): void
+# type OnComboChangedCb {.importc.} = proc(id: cint, selected_index: cint): void
+# type OnNumericValueChangedCb {.importc.} = proc(id: cint, value: cfloat): void
+# type OnBooleanValueChangedCb {.importc.} = proc(id: cint, value: bool): void
+# type OnMultipleNumericValuesChangedCb {.importc.} = proc(id: cint, values: pointer, num_values: cint): void
+# type OnClickCb {.importc.} = proc(id: cint): void
+
 proc init(
     assetsBasePath: cstring, 
     rawFontDefinitions: cstring, 
     rawStyleOverrideDefinitions: cstring,
-    onInit: proc(): void, 
-    onTextChanged: proc(id: cint, value: cstring): void, 
-    onComboChanged: proc(id: cint, selected_index: cint): void,
-    onNumericValueChanged: proc(id: cint, value: cfloat): void, 
-    onBooleanValueChanged: proc(id: cint, value: bool): void,
-    onMultipleNumericValuesChanged: proc(id: cint, values: pointer, num_values: cint): void, 
-    onClick: proc(id: cint): void
+    onInit: proc(): void {.cdecl.}, 
+    onTextChanged: proc(id: cint, value: cstring): void {.cdecl.}, 
+    onComboChanged: proc(id: cint, selected_index: cint): void {.cdecl.} ,
+    onNumericValueChanged: proc(id: cint, value: cfloat): void {.cdecl.}, 
+    onBooleanValueChanged: proc(id: cint, value: bool): void {.cdecl.},
+    onMultipleNumericValuesChanged: proc(id: cint, values: pointer, num_values: cint): void {.cdecl.}, 
+    onClick: proc(id: cint): void {.cdecl.}
     ) {.importc, dynlib: ffiLib.}
 
-proc onInit(): void =
-    echo "init"
+proc onInit(): void {.cdecl.} =
+    discard
 
-proc onTextChanged(id: cint, value: cstring): void =
+proc onTextChanged(id: cint, value: cstring): void {.cdecl.} =
     echo "onTextChanged"
 
-proc onComboChanged(id: cint, selected_index: cint): void =
+proc onComboChanged(id: cint, selected_index: cint): void {.cdecl.} =
     echo "onComboChanged"
 
-proc onNumericValueChanged(id: cint, value: cfloat): void =
+proc onNumericValueChanged(id: cint, value: cfloat): void {.cdecl.} =
     echo "onNumericValueChanged"
 
-proc onBooleanValueChanged(id: cint, value: bool): void =
+proc onBooleanValueChanged(id: cint, value: bool): void {.cdecl.} =
     echo "onBooleanValueChanged"
 
-proc onMultipleNumericValuesChanged(id: cint, values: pointer, num_values: cint): void =
+proc onMultipleNumericValuesChanged(id: cint, values: pointer, num_values: cint): void {.cdecl.} =
     echo "onMultipleNumericValuesChanged"
 
-proc onClick(id: cint): void =
+proc onClick(id: cint): void {.cdecl.} =
     echo "onClick"
 
 var baseAssetsPath = "./assets"
@@ -208,7 +216,5 @@ let theme2Json = $theme2
 init(baseAssetsPath.cstring(), fontDefsJson.cstring(), theme2Json.cstring(), onInit, onTextChanged, onComboChanged, onNumericValueChanged, onBooleanValueChanged, onMultipleNumericValuesChanged, onClick)
 
 
-# echo readLineFromStdin("Is Nim awesome? (Y/n): ")
+echo readLineFromStdin("Press enter to exit")
 
-while true:
-    sleep 1000
