@@ -103,55 +103,6 @@ var fontDefs = %* { "defs": [
   ] 
 }
 
-echo fontDefs
-echo theme2
-
-# type
-#   Node = object
-#     id: string
-#     root: string
-#     typ: string
-
-#   UnformattedText = object
-#     id: string
-#     text: string
-#     typ: string
-
-# # Constructor for Node
-# proc initNode(id, root: string): Node =
-#   result.typ = "node"
-#   result.id = id
-#   result.root = root
-
-# # toJson for Node
-# proc toJson(node: Node): cstring =
-#   %* {
-#     "type": node.typ,
-#     "id": node.id,
-#     "root": node.root
-#   }
-
-# # Constructor for UnformattedText
-# proc initUnformattedText(id, text: string): UnformattedText =
-#   result.typ = "unformatted-text"
-#   result.id = id
-#   result.text = text
-
-# # toJson for UnformattedText
-# proc toJson(utext: UnformattedText): cstring =
-#   %* {
-#     "type": utext.typ,
-#     "id": utext.id,
-#     "text": utext.text
-#   }
-
-# # Example usage
-# let node = initNode("1", "root1")
-# echo toJson(node)
-
-# let uText = initUnformattedText("2", "Some unformatted text")
-# echo toJson(uText)
-
 when defined(windows):
   const ffiLib = "./xframesshared.dll"
 elif defined(linux):
@@ -163,14 +114,6 @@ elif defined(bsd):
 else:
   echo "Unsupported platform"
   quit(1)
-
-# type OnInitCb {.importc, dynlib: ffiLib.} = proc(): void
-# type OnTextChangedCb {.importc.} = proc(id: cint, value: cstring): void
-# type OnComboChangedCb {.importc.} = proc(id: cint, selected_index: cint): void
-# type OnNumericValueChangedCb {.importc.} = proc(id: cint, value: cfloat): void
-# type OnBooleanValueChangedCb {.importc.} = proc(id: cint, value: bool): void
-# type OnMultipleNumericValuesChangedCb {.importc.} = proc(id: cint, values: pointer, num_values: cint): void
-# type OnClickCb {.importc.} = proc(id: cint): void
 
 proc init(
     assetsBasePath: cstring, 
@@ -185,8 +128,32 @@ proc init(
     onClick: proc(id: cint): void {.cdecl.}
     ) {.importc, dynlib: ffiLib.}
 
+proc setElement(elementJson: cstring) {.importc, dynlib: ffiLib.}
+proc setChildren(parentId: cint, childrenJson: cstring) {.importc, dynlib: ffiLib.}
+
 proc onInit(): void {.cdecl.} =
-    discard
+    let rootNodeJsonData = %* {
+        "type": "node",
+        "id": 0,
+        "root": true
+    }
+    let unformattedTextJsonData = %* {
+        "type": "unformatted-text",
+        "id": 1,
+        "text": "Hello, world"
+    }
+
+    let childrenIdsJsonData = %* [1]
+
+    let rootNodeJson = $rootNodeJsonData
+    let unformattedTextJson = $unformattedTextJsonData
+
+    let childrenIdsJson = $childrenIdsJsonData
+
+    setElement(rootNodeJson.cstring())
+    setElement(unformattedTextJson.cstring())
+
+    setChildren(0, childrenIdsJson.cstring())
 
 proc onTextChanged(id: cint, value: cstring): void {.cdecl.} =
     echo "onTextChanged"
