@@ -27,3 +27,7 @@ Windows 11
 Ubuntu 24.04
 
 ![Screenshot from 2025-01-14 22-30-15](https://github.com/user-attachments/assets/80e2900c-7ee7-49c1-8e94-b657fa5ecd7d)
+
+Raspberry Pi 5
+
+![image](https://github.com/user-attachments/assets/28770019-4eb8-4b21-945c-eddd88a7d9cf)
