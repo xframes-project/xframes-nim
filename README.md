@@ -4,6 +4,10 @@
 
 ### Install Nim
 
+#### Ubuntu
+
+`sudo apt install nim`
+
 #### Windows
 
 I recommend to install nim through winget
