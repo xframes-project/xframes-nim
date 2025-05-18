@@ -6,7 +6,7 @@
 
 #### Ubuntu
 
-`sudo apt install nim`
+`curl https://nim-lang.org/choosenim/init.sh -sSf | sh`
 
 #### Windows
 
